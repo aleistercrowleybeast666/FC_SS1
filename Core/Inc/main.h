@@ -59,6 +59,7 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define RADIO_DIO1_Pin GPIO_PIN_2
 #define RADIO_DIO1_GPIO_Port GPIOE
+#define RADIO_DIO1_EXTI_IRQn EXTI2_IRQn
 #define RADIO_DIO2_Pin GPIO_PIN_3
 #define RADIO_DIO2_GPIO_Port GPIOE
 #define RADIO_DIO3_Pin GPIO_PIN_4

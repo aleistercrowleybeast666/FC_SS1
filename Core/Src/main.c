@@ -27,7 +27,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "debug_log.h"
+#include "lora_sx1280.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -99,7 +100,11 @@ int main(void)
   MX_SPI2_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
+  DebugLog_Init();
+  DebugLog_Print("Debug serial init");
 
+  Lora_Init();
+  DebugLog_Print("LoRa init done");
   /* USER CODE END 2 */
 
   /* Init scheduler */

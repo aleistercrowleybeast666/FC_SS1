@@ -12,6 +12,7 @@ srcDirs:
   - Drivers
   - Protocol
   - Middlewares
+  - Modules
 virtualFolder:
   name: <virtual_root>
   files:
