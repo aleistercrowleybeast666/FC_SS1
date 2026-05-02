@@ -75,6 +75,13 @@ const osThreadAttr_t RADIO_TXRX_TASK_attributes = {
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for SENSOR_R_TASK */
+osThreadId_t SENSOR_R_TASKHandle;
+const osThreadAttr_t SENSOR_R_TASK_attributes = {
+  .name = "SENSOR_R_TASK",
+  .stack_size = 640 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -85,6 +92,7 @@ void StartDefaultTask(void *argument);
 void StartKEY_SCAN_TASK(void *argument);
 void StartTEST_TASK(void *argument);
 void StartRADIO_TXRX_TASK(void *argument);
+void StartSENSOR_R_TASK(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -126,6 +134,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of RADIO_TXRX_TASK */
   RADIO_TXRX_TASKHandle = osThreadNew(StartRADIO_TXRX_TASK, NULL, &RADIO_TXRX_TASK_attributes);
+
+  /* creation of SENSOR_R_TASK */
+  SENSOR_R_TASKHandle = osThreadNew(StartSENSOR_R_TASK, NULL, &SENSOR_R_TASK_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -207,6 +218,24 @@ __weak void StartRADIO_TXRX_TASK(void *argument)
     osDelay(1);
   }
   /* USER CODE END StartRADIO_TXRX_TASK */
+}
+
+/* USER CODE BEGIN Header_StartSENSOR_R_TASK */
+/**
+* @brief Function implementing the SENSOR_R_TASK thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartSENSOR_R_TASK */
+__weak void StartSENSOR_R_TASK(void *argument)
+{
+  /* USER CODE BEGIN StartSENSOR_R_TASK */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartSENSOR_R_TASK */
 }
 
 /* Private application code --------------------------------------------------*/

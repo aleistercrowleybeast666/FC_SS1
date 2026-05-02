@@ -2,6 +2,7 @@
 #include "bsp_uart_debug.h"
 #include "debug_config.h"
 #include "bsp_sx1281_port.h"
+#include "gnss_neo_m9n.h"
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
@@ -17,6 +18,10 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
     {
         BspUartDebug_RxEventCallback(huart, Size);
     }
+    else if (huart == &huart2)
+    {
+        GnssNeoM9n_RxEventCallback(huart, Size);
+    }
 }
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
@@ -24,6 +29,10 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
     if (huart == &DEBUG_UART_HANDLE)
     {
         BspUartDebug_ErrorCallback(huart);
+    }
+    else if (huart == &huart2)
+    {
+        GnssNeoM9n_ErrorCallback(huart);
     }
 }
 

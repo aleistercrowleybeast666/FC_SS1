@@ -53,7 +53,7 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(RADIO_RST_GPIO_Port, RADIO_RST_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(RADIO_RST_GPIO_Port, RADIO_RST_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
@@ -62,13 +62,16 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(SPI_RADIO_NSS_GPIO_Port, SPI_RADIO_NSS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, SPI_IMU_NSS1A_Pin|SPI_IMU_NSS1G_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, SPI_IMU_NSS1A_Pin|SPI_IMU_NSS1G_Pin|SPI_IMU_NSS2_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, P_CONTROL1_Pin|P_CONTROL2_Pin|S_CONTROL1_Pin|S_CONTROL2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GNSS_RST_GPIO_Port, GNSS_RST_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GNSS_EXTINT_GPIO_Port, GNSS_EXTINT_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GNSS_RST_GPIO_Port, GNSS_RST_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pins : RADIO_DIO1_Pin IMU1_INT1_Pin IMU1_INT2_Pin IMU1_INT3_Pin
                            IMU1_INT4_Pin IMU2_INT1_Pin IMU2_INT2_Pin */
@@ -93,7 +96,7 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pin : RADIO_RST_Pin */
   GPIO_InitStruct.Pin = RADIO_RST_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(RADIO_RST_GPIO_Port, &GPIO_InitStruct);
 
@@ -117,20 +120,12 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(SPI_RADIO_NSS_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : SPI_IMU_NSS1A_Pin SPI_IMU_NSS1G_Pin */
-  GPIO_InitStruct.Pin = SPI_IMU_NSS1A_Pin|SPI_IMU_NSS1G_Pin;
+  /*Configure GPIO pins : SPI_IMU_NSS1A_Pin SPI_IMU_NSS1G_Pin SPI_IMU_NSS2_Pin */
+  GPIO_InitStruct.Pin = SPI_IMU_NSS1A_Pin|SPI_IMU_NSS1G_Pin|SPI_IMU_NSS2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : SPI_IMU_NSS2_Pin */
-  GPIO_InitStruct.Pin = SPI_IMU_NSS2_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF15_EVENTOUT;
-  HAL_GPIO_Init(SPI_IMU_NSS2_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : P_CONTROL1_Pin P_CONTROL2_Pin S_CONTROL1_Pin S_CONTROL2_Pin */
   GPIO_InitStruct.Pin = P_CONTROL1_Pin|P_CONTROL2_Pin|S_CONTROL1_Pin|S_CONTROL2_Pin;
@@ -147,8 +142,9 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : GNSS_EXTINT_Pin */
   GPIO_InitStruct.Pin = GNSS_EXTINT_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GNSS_EXTINT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : GNSS_TIMEPAUSE_Pin */
@@ -160,7 +156,7 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pin : GNSS_RST_Pin */
   GPIO_InitStruct.Pin = GNSS_RST_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GNSS_RST_GPIO_Port, &GPIO_InitStruct);
 

@@ -135,7 +135,6 @@ void Error_Handler(void);
 #define UART_EXT_MR_GPIO_Port GPIOA
 #define GNSS_EXTINT_Pin GPIO_PIN_5
 #define GNSS_EXTINT_GPIO_Port GPIOB
-#define GNSS_EXTINT_EXTI_IRQn EXTI9_5_IRQn
 #define GNSS_TIMEPAUSE_Pin GPIO_PIN_7
 #define GNSS_TIMEPAUSE_GPIO_Port GPIOB
 #define GNSS_RST_Pin GPIO_PIN_9

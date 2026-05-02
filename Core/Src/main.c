@@ -32,6 +32,7 @@
 #include "lora_sx1281.h"
 #include "PWM_servo.h"
 #include "PWR_out.h"
+#include "sensors.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -109,12 +110,16 @@ int main(void)
   {
     Error_Handler();
   }
+  DebugLog_Print("Output init");
 
   DebugLog_Init();
   DebugLog_Print("Debug serial init");
 
+  Sensors_Init();
+  DebugLog_Print("Sensors init");
+
   Lora_Init();
-  DebugLog_Print("LoRa init done");
+  DebugLog_Print("LoRa init");
   /* USER CODE END 2 */
 
   /* Init scheduler */
