@@ -22,6 +22,7 @@
 #include "dma.h"
 #include "i2c.h"
 #include "spi.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -29,6 +30,8 @@
 /* USER CODE BEGIN Includes */
 #include "debug_log.h"
 #include "lora_sx1281.h"
+#include "PWM_servo.h"
+#include "PWR_out.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -99,7 +102,14 @@ int main(void)
   MX_USART2_UART_Init();
   MX_SPI2_Init();
   MX_I2C2_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
+  PwrOut_Init();
+  if (PwmServo_Init() != PWM_SERVO_INIT_OK)
+  {
+    Error_Handler();
+  }
+
   DebugLog_Init();
   DebugLog_Print("Debug serial init");
 

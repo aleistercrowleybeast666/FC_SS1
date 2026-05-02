@@ -65,8 +65,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOE, SPI_IMU_NSS1A_Pin|SPI_IMU_NSS1G_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, P_CONTROL1_Pin|P_CONTROL2_Pin|S_CONTROL1_Pin|S_CONTROL2_Pin
-                          |S_CONTROL3_Pin|S_CONTROL4_Pin|S_CONTROL5_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, P_CONTROL1_Pin|P_CONTROL2_Pin|S_CONTROL1_Pin|S_CONTROL2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GNSS_RST_GPIO_Port, GNSS_RST_Pin, GPIO_PIN_RESET);
@@ -133,10 +132,8 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF15_EVENTOUT;
   HAL_GPIO_Init(SPI_IMU_NSS2_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : P_CONTROL1_Pin P_CONTROL2_Pin S_CONTROL1_Pin S_CONTROL2_Pin
-                           S_CONTROL3_Pin S_CONTROL4_Pin S_CONTROL5_Pin */
-  GPIO_InitStruct.Pin = P_CONTROL1_Pin|P_CONTROL2_Pin|S_CONTROL1_Pin|S_CONTROL2_Pin
-                          |S_CONTROL3_Pin|S_CONTROL4_Pin|S_CONTROL5_Pin;
+  /*Configure GPIO pins : P_CONTROL1_Pin P_CONTROL2_Pin S_CONTROL1_Pin S_CONTROL2_Pin */
+  GPIO_InitStruct.Pin = P_CONTROL1_Pin|P_CONTROL2_Pin|S_CONTROL1_Pin|S_CONTROL2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
