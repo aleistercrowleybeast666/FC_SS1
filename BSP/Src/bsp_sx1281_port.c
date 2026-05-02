@@ -1,4 +1,4 @@
-#include "bsp_sx1280_port.h"
+#include "bsp_sx1281_port.h"
 
 #include "hw.h"
 #include "spi.h"
@@ -7,7 +7,7 @@ static DioIrqHandler *s_dio1_irq_handler = 0;
 static DioIrqHandler *s_dio2_irq_handler = 0;
 static DioIrqHandler *s_dio3_irq_handler = 0;
 
-void BspSx1280_PortInit(void)
+void BspSx1281_PortInit(void)
 {
     s_dio1_irq_handler = 0;
     s_dio2_irq_handler = 0;
@@ -52,7 +52,7 @@ void SpiInOut(uint8_t *txBuffer, uint8_t *rxBuffer, uint16_t size)
     HAL_SPI_TransmitReceive(&hspi1, txBuffer, rxBuffer, size, HAL_MAX_DELAY);
 }
 
-void BspSx1280_OnExti(uint16_t gpioPin)
+void BspSx1281_OnExti(uint16_t gpioPin)
 {
     if ((gpioPin == RADIO_DIO1_Pin) && (s_dio1_irq_handler != 0))
     {

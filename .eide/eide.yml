@@ -13,6 +13,9 @@ srcDirs:
   - Protocol
   - Middlewares
   - Modules
+  - Algorithm
+  - Devices
+  - Middlewares/Third_Party/SX1280lib
 virtualFolder:
   name: <virtual_root>
   files:

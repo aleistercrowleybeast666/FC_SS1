@@ -154,26 +154,38 @@ void SX1280HalReset( void )
 
 void SX1280HalClearInstructionRam( void )
 {
-    // Clearing the instruction RAM is writing 0x00s on every bytes of the
-    // instruction RAM
-    uint16_t halSize = 3 + IRAM_SIZE;
-    halTxBuffer[0] = RADIO_WRITE_REGISTER;
-    halTxBuffer[1] = ( IRAM_START_ADDRESS >> 8 ) & 0x00FF;
-    halTxBuffer[2] = IRAM_START_ADDRESS & 0x00FF;
-    for( uint16_t index = 0; index < IRAM_SIZE; index++ )
+    uint16_t remain = IRAM_SIZE;
+    uint16_t addr = IRAM_START_ADDRESS;
+    uint16_t chunk;
+    uint16_t halSize;
+
+    while( remain > 0 )
     {
-        halTxBuffer[3+index] = 0x00;
+        /* 预留前3字节给命令和地址 */
+        chunk = remain;
+        if( chunk > ( MAX_HAL_BUFFER_SIZE - 3U ) )
+        {
+            chunk = ( MAX_HAL_BUFFER_SIZE - 3U );
+        }
+
+        halTxBuffer[0] = RADIO_WRITE_REGISTER;
+        halTxBuffer[1] = ( addr >> 8 ) & 0x00FF;
+        halTxBuffer[2] = addr & 0x00FF;
+
+        memset( &halTxBuffer[3], 0x00, chunk );
+        halSize = ( uint16_t )( chunk + 3U );
+
+        SX1280HalWaitOnBusy( );
+
+        GpioWrite( RADIO_NSS_PORT, RADIO_NSS_PIN, 0 );
+        SpiIn( halTxBuffer, halSize );
+        GpioWrite( RADIO_NSS_PORT, RADIO_NSS_PIN, 1 );
+
+        SX1280HalWaitOnBusy( );
+
+        addr = ( uint16_t )( addr + chunk );
+        remain = ( uint16_t )( remain - chunk );
     }
-
-    SX1280HalWaitOnBusy( );
-
-    GpioWrite( RADIO_NSS_PORT, RADIO_NSS_PIN, 0 );
-
-    SpiIn( halTxBuffer, halSize );
-
-    GpioWrite( RADIO_NSS_PORT, RADIO_NSS_PIN, 1 );
-
-    SX1280HalWaitOnBusy( );
 }
 
 void SX1280HalWakeup( void )

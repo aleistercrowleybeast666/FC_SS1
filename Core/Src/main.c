@@ -28,7 +28,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "debug_log.h"
-#include "lora_sx1280.h"
+#include "lora_sx1281.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

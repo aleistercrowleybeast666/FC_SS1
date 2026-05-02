@@ -1,5 +1,5 @@
-#ifndef DEBUG_LOG_H
-#define DEBUG_LOG_H
+#ifndef __DEBUG_LOG_H
+#define __DEBUG_LOG_H
 
 #include <stdint.h>
 

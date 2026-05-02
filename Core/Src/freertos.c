@@ -68,6 +68,13 @@ const osThreadAttr_t TEST_TASK_attributes = {
   .stack_size = 1280 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for RADIO_TXRX_TASK */
+osThreadId_t RADIO_TXRX_TASKHandle;
+const osThreadAttr_t RADIO_TXRX_TASK_attributes = {
+  .name = "RADIO_TXRX_TASK",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -77,6 +84,7 @@ const osThreadAttr_t TEST_TASK_attributes = {
 void StartDefaultTask(void *argument);
 void StartKEY_SCAN_TASK(void *argument);
 void StartTEST_TASK(void *argument);
+void StartRADIO_TXRX_TASK(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -115,6 +123,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of TEST_TASK */
   TEST_TASKHandle = osThreadNew(StartTEST_TASK, NULL, &TEST_TASK_attributes);
+
+  /* creation of RADIO_TXRX_TASK */
+  RADIO_TXRX_TASKHandle = osThreadNew(StartRADIO_TXRX_TASK, NULL, &RADIO_TXRX_TASK_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -178,6 +189,24 @@ __weak void StartTEST_TASK(void *argument)
     osDelay(1);
   }
   /* USER CODE END StartTEST_TASK */
+}
+
+/* USER CODE BEGIN Header_StartRADIO_TXRX_TASK */
+/**
+* @brief Function implementing the RADIO_TXRX_TASK thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartRADIO_TXRX_TASK */
+__weak void StartRADIO_TXRX_TASK(void *argument)
+{
+  /* USER CODE BEGIN StartRADIO_TXRX_TASK */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartRADIO_TXRX_TASK */
 }
 
 /* Private application code --------------------------------------------------*/

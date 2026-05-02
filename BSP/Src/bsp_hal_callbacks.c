@@ -1,7 +1,7 @@
 #include "main.h"
 #include "bsp_uart_debug.h"
 #include "debug_config.h"
-#include "bsp_sx1280_port.h"
+#include "bsp_sx1281_port.h"
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
@@ -31,6 +31,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if (GPIO_Pin == RADIO_DIO1_Pin)
     {
-        BspSx1280_OnExti(GPIO_Pin);
+        BspSx1281_OnExti(GPIO_Pin);
     }
 }
