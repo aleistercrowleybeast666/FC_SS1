@@ -53,19 +53,6 @@ typedef struct
     uint32_t error_count;
 } SensorsMagData_t;
 
-typedef struct SensorsImuRawData_t
-{
-    uint8_t imu_id;
-    uint32_t lastUpdate_ms;
-    uint8_t online;
-} SensorsImuRawData_t;
-
-typedef struct SensorsImuEkfData_t
-{
-    uint32_t lastUpdate_ms;
-    uint8_t valid;
-} SensorsImuEkfData_t;
-
 void Sensors_Init(void);
 void Sensors_TaskUpdate(void);
 uint8_t Sensors_GetGnss(SensorsGnssData_t *out);
@@ -103,8 +90,5 @@ void Sensors_GnssClearOrigin(void);
 /* 查询当前是否已经设置本地 XY 原点。
  * 已设置返回 1，未设置返回 0；该接口只读取快照/状态，不访问 GNSS 或 I2C。 */
 uint8_t Sensors_GnssHasLocalOrigin(void);
-
-uint8_t Sensors_GetImuRaw(uint8_t imu_id, SensorsImuRawData_t *out);
-uint8_t Sensors_GetImuForEkf(SensorsImuEkfData_t *out);
 
 #endif /* __SENSORS_H */

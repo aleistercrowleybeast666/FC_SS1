@@ -93,9 +93,12 @@ Devices/Src/lora_sx1281.c \
 Devices/Src/PWR_out.c \
 Devices/Src/PWM_servo.c \
 Devices/Src/gnss_neo_m9n.c \
+Devices/Src/imu_bmi088.c \
+Devices/Src/imu_icm42688p.c \
 Devices/Src/baro_bmp390.c \
 Devices/Src/mag_mmc5983ma.c \
 Modules/Src/radio_function.c \
+Modules/Src/imu_manager.c \
 Modules/Src/sensors.c \
 Protocol/Src/air_protocol.c \
 Middlewares/Third_Party/SX1280lib/sx1280.c \

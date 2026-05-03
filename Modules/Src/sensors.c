@@ -3,6 +3,7 @@
 #include "baro_bmp390.h"
 #include "cmsis_gcc.h"
 #include "gnss_neo_m9n.h"
+#include "imu_manager.h"
 #include "mag_mmc5983ma.h"
 #include "main.h"
 #include "sensor_config.h"
@@ -233,6 +234,7 @@ void Sensors_TaskUpdate(void)
 #endif
     Sensors_GnssLocalUpdate(&gnss_data);
     Sensors_GnssSnapshotUpdate(&gnss_data);
+    ImuManager_Update();
 
     if ((now_ms - s_baro_last_ms) >= SENSORS_BARO_PERIOD_MS)
     {
@@ -393,27 +395,4 @@ void Sensors_GnssClearOrigin(void)
 uint8_t Sensors_GnssHasLocalOrigin(void)
 {
     return Sensors_GnssOriginGet(NULL, NULL);
-}
-
-uint8_t Sensors_GetImuRaw(uint8_t imu_id, SensorsImuRawData_t *out)
-{
-    if (out == NULL)
-    {
-        return 0U;
-    }
-
-    memset(out, 0, sizeof(*out));
-    out->imu_id = imu_id;
-    return 0U;
-}
-
-uint8_t Sensors_GetImuForEkf(SensorsImuEkfData_t *out)
-{
-    if (out == NULL)
-    {
-        return 0U;
-    }
-
-    memset(out, 0, sizeof(*out));
-    return 0U;
 }

@@ -36,6 +36,17 @@
 #define GNSS_RN_M                   6378137.0f
 #define GNSS_LOCAL_AUTO_ORIGIN_ENABLE 1U
 #define GNSS_DEG_TO_RAD             0.017453292519943295f
+/*
+ * GNSS 天线相位中心相对飞控/IMU 参考点的位置，单位 m，机体系：
+ * X 机体前向为正，Y 机体左向为正，Z 机体上向为正。
+ * 第一版不参与 GNSS 经纬度转 XY。
+ * 后续如果 ESKF 融合 GNSS 位置/速度，可在观测模型中使用：
+ * p_gnss = p_body + R_nb * r_gnss_body
+ * v_gnss = v_body + R_nb * (omega_body x r_gnss_body)
+ */
+#define GNSS_LEVER_ARM_X_M          0.050f
+#define GNSS_LEVER_ARM_Y_M          0.000f
+#define GNSS_LEVER_ARM_Z_M          0.000f
 
 #define BARO_TIMEOUT_MS             200U
 #define MAG_TIMEOUT_MS              200U

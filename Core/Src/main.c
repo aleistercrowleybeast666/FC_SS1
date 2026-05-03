@@ -29,6 +29,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "debug_log.h"
+#include "imu_manager.h"
 #include "lora_sx1281.h"
 #include "PWM_servo.h"
 #include "PWR_out.h"
@@ -105,6 +106,9 @@ int main(void)
   MX_I2C2_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
+  DebugLog_Init();
+  DebugLog_Print("Debug serial init");
+
   PwrOut_Init();
   if (PwmServo_Init() != PWM_SERVO_INIT_OK)
   {
@@ -112,11 +116,10 @@ int main(void)
   }
   DebugLog_Print("Output init");
 
-  DebugLog_Init();
-  DebugLog_Print("Debug serial init");
-
   Sensors_Init();
   DebugLog_Print("Sensors init");
+  ImuManager_Init();
+  DebugLog_Print("IMU init");
 
   Lora_Init();
   DebugLog_Print("LoRa init");
