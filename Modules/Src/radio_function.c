@@ -8,6 +8,15 @@
 #define RADIO_STATUS_REPEAT_INTERVAL_MS    50U
 #define RADIO_STATUS_QUEUE_DEPTH           8U
 #define RADIO_STATUS_MAX_REPEAT_COUNT      3U
+#define RADIO_COMMAND_EVENT_QUEUE_DEPTH    8U
+
+#define RADIO_CMD_FRAME_SEQ_OFFSET         1U
+#define RADIO_CMD_FRAME_ID_OFFSET          2U
+#define RADIO_CMD_FRAME_TOKEN_OFFSET       3U
+#define RADIO_CMD_FRAME_TOKEN_LEN          4U
+#define RADIO_CMD_FRAME_TOKEN_MIN_LEN      (RADIO_CMD_FRAME_TOKEN_OFFSET + RADIO_CMD_FRAME_TOKEN_LEN)
+#define RADIO_CMD_FRAME_PARAM0_OFFSET      7U
+#define RADIO_CMD_FRAME_PARAM1_OFFSET      8U
 
 typedef struct
 {
@@ -30,6 +39,7 @@ typedef struct
 } RadioLastCmdAck;
 
 static RadioStatusPacket s_status_queue[RADIO_STATUS_QUEUE_DEPTH];
+static RadioCommandEvent s_command_event_queue[RADIO_COMMAND_EVENT_QUEUE_DEPTH];
 static volatile RadioFlightState s_radio_flight_state;
 static volatile RadioLoraFlag s_radio_lora_flag = LORA_OFF;
 static volatile RadioCommandFlag s_radio_command_flag = RADIO_COMMAND_NONE;
@@ -40,6 +50,9 @@ static volatile RadioMissionState s_radio_mission_state = RADIO_MISSION_STATE_ID
 static uint8_t s_status_head = 0U;
 static uint8_t s_status_tail = 0U;
 static uint8_t s_status_count = 0U;
+static uint8_t s_command_event_head = 0U;
+static uint8_t s_command_event_tail = 0U;
+static uint8_t s_command_event_count = 0U;
 
 static uint8_t s_flight_seq = 0U;
 static uint8_t s_status_seq = 0U;
@@ -69,6 +82,99 @@ static void Radio_IrqUnlock(uint32_t primask)
 static uint8_t Radio_TimeElapsed(uint32_t now_tick, uint32_t last_tick, uint32_t period_ms)
 {
     return (((uint32_t)(now_tick - last_tick)) >= period_ms) ? 1U : 0U;
+}
+
+static uint32_t Radio_CmdFrameTokenGet(const uint8_t *frame)
+{
+    return ((uint32_t)frame[RADIO_CMD_FRAME_TOKEN_OFFSET]) |
+           ((uint32_t)frame[RADIO_CMD_FRAME_TOKEN_OFFSET + 1U] << 8) |
+           ((uint32_t)frame[RADIO_CMD_FRAME_TOKEN_OFFSET + 2U] << 16) |
+           ((uint32_t)frame[RADIO_CMD_FRAME_TOKEN_OFFSET + 3U] << 24);
+}
+
+static void Radio_CommandEventPush(uint8_t seq,
+                                   uint8_t cmd_id,
+                                   uint32_t token,
+                                   uint8_t param0,
+                                   uint8_t param1,
+                                   uint8_t frame_len,
+                                   AirAckResult ack_result)
+{
+    RadioCommandEvent *event;
+    uint32_t primask;
+
+    primask = Radio_IrqLock();
+
+    if (s_command_event_count >= RADIO_COMMAND_EVENT_QUEUE_DEPTH)
+    {
+        s_command_event_tail++;
+        if (s_command_event_tail >= RADIO_COMMAND_EVENT_QUEUE_DEPTH)
+        {
+            s_command_event_tail = 0U;
+        }
+        s_command_event_count--;
+    }
+
+    event = &s_command_event_queue[s_command_event_head];
+    event->seq = seq;
+    event->cmd_id = cmd_id;
+    event->token = token;
+    event->param0 = param0;
+    event->param1 = param1;
+    event->frame_len = frame_len;
+    event->ack_result = ack_result;
+
+    s_command_event_head++;
+    if (s_command_event_head >= RADIO_COMMAND_EVENT_QUEUE_DEPTH)
+    {
+        s_command_event_head = 0U;
+    }
+    s_command_event_count++;
+
+    Radio_IrqUnlock(primask);
+}
+
+static void Radio_CommandEventPushFromFrame(const uint8_t *frame,
+                                            uint8_t frame_len,
+                                            AirAckResult ack_result)
+{
+    uint8_t seq = 0U;
+    uint8_t cmd_id = 0U;
+    uint32_t token = 0U;
+    uint8_t param0 = 0U;
+    uint8_t param1 = 0U;
+
+    if (frame == 0U)
+    {
+        return;
+    }
+
+    if (frame_len > RADIO_CMD_FRAME_SEQ_OFFSET)
+    {
+        seq = frame[RADIO_CMD_FRAME_SEQ_OFFSET];
+    }
+
+    if (frame_len > RADIO_CMD_FRAME_ID_OFFSET)
+    {
+        cmd_id = frame[RADIO_CMD_FRAME_ID_OFFSET];
+    }
+
+    if (frame_len >= RADIO_CMD_FRAME_TOKEN_MIN_LEN)
+    {
+        token = Radio_CmdFrameTokenGet(frame);
+    }
+
+    if (frame_len > RADIO_CMD_FRAME_PARAM0_OFFSET)
+    {
+        param0 = frame[RADIO_CMD_FRAME_PARAM0_OFFSET];
+    }
+
+    if (frame_len > RADIO_CMD_FRAME_PARAM1_OFFSET)
+    {
+        param1 = frame[RADIO_CMD_FRAME_PARAM1_OFFSET];
+    }
+
+    Radio_CommandEventPush(seq, cmd_id, token, param0, param1, frame_len, ack_result);
 }
 
 static void Radio_FlightStateSnapshotGet(RadioFlightState *snapshot)
@@ -166,6 +272,37 @@ RadioCommandGetLatestResult Radio_CommandGetLatest(RadioCommandFlag *cmd,
     Radio_IrqUnlock(primask);
 
     return RADIO_COMMAND_GET_LATEST_OK;
+}
+
+RadioCommandEventDequeueResult Radio_CommandEventDequeue(RadioCommandEvent *event)
+{
+    uint32_t primask;
+
+    if (event == 0U)
+    {
+        return RADIO_COMMAND_EVENT_DEQUEUE_BAD_PARAM;
+    }
+
+    primask = Radio_IrqLock();
+
+    if (s_command_event_count == 0U)
+    {
+        Radio_IrqUnlock(primask);
+        return RADIO_COMMAND_EVENT_DEQUEUE_EMPTY;
+    }
+
+    *event = s_command_event_queue[s_command_event_tail];
+
+    s_command_event_tail++;
+    if (s_command_event_tail >= RADIO_COMMAND_EVENT_QUEUE_DEPTH)
+    {
+        s_command_event_tail = 0U;
+    }
+    s_command_event_count--;
+
+    Radio_IrqUnlock(primask);
+
+    return RADIO_COMMAND_EVENT_DEQUEUE_OK;
 }
 
 void Radio_LockStateSet(RadioLockState state)
@@ -411,13 +548,19 @@ static void Radio_AirFrameProcess(const uint8_t *frame, uint8_t frame_len)
     AirParseResult parse_result;
     uint8_t ack_cmd_id = 0U;
 
-    if ((frame == 0U) || (frame_len < 2U))
+    if ((frame == 0U) || (frame_len == 0U))
     {
         return;
     }
 
     if (frame[0] != AIR_TYPE_CMD)
     {
+        return;
+    }
+
+    if (frame_len < 2U)
+    {
+        Radio_CommandEventPushFromFrame(frame, frame_len, AIR_ACK_RESULT_BAD_LEN);
         return;
     }
 
@@ -428,6 +571,7 @@ static void Radio_AirFrameProcess(const uint8_t *frame, uint8_t frame_len)
 
     if (frame_len != AIR_CMD_LEN)
     {
+        Radio_CommandEventPushFromFrame(frame, frame_len, AIR_ACK_RESULT_BAD_LEN);
         Radio_AckSend(frame[1], ack_cmd_id, AIR_ACK_RESULT_BAD_LEN);
         return;
     }
@@ -446,14 +590,23 @@ static void Radio_AirFrameProcess(const uint8_t *frame, uint8_t frame_len)
             }
         }
 
+        Radio_CommandEventPush(cmd.seq,
+                               cmd.cmd_id,
+                               cmd.token,
+                               cmd.param0,
+                               cmd.param1,
+                               frame_len,
+                               result);
         Radio_AckSend(cmd.seq, cmd.cmd_id, result);
     }
     else if (parse_result == AIR_PARSE_BAD_LEN)
     {
+        Radio_CommandEventPushFromFrame(frame, frame_len, AIR_ACK_RESULT_BAD_LEN);
         Radio_AckSend(frame[1], ack_cmd_id, AIR_ACK_RESULT_BAD_LEN);
     }
     else
     {
+        Radio_CommandEventPushFromFrame(frame, frame_len, AIR_ACK_RESULT_BAD_CMD);
         Radio_AckSend(frame[1], ack_cmd_id, AIR_ACK_RESULT_BAD_CMD);
     }
 }

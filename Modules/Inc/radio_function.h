@@ -51,11 +51,29 @@ typedef enum
 
 typedef enum
 {
+    RADIO_COMMAND_EVENT_DEQUEUE_OK = 0U,
+    RADIO_COMMAND_EVENT_DEQUEUE_EMPTY,
+    RADIO_COMMAND_EVENT_DEQUEUE_BAD_PARAM
+} RadioCommandEventDequeueResult;
+
+typedef enum
+{
     RADIO_COMMAND_NONE = 0U,
     RADIO_COMMAND_START,
     RADIO_COMMAND_LOCK,
     RADIO_COMMAND_UNLOCK
 } RadioCommandFlag;
+
+typedef struct
+{
+    uint8_t seq;
+    uint8_t cmd_id;
+    uint32_t token;
+    uint8_t param0;
+    uint8_t param1;
+    uint8_t frame_len;
+    AirAckResult ack_result;
+} RadioCommandEvent;
 
 typedef enum
 {
@@ -78,6 +96,7 @@ RadioLoraFlag Radio_LoraFlagGet(void);
 RadioCommandGetLatestResult Radio_CommandGetLatest(RadioCommandFlag *cmd,
                                                    uint8_t *seq,
                                                    uint32_t *counter);
+RadioCommandEventDequeueResult Radio_CommandEventDequeue(RadioCommandEvent *event);
 
 void Radio_LockStateSet(RadioLockState state);
 void Radio_MissionStateSet(RadioMissionState state);
